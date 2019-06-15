@@ -84,14 +84,15 @@ TEST_CASE("Octree generation & subdivision 1000 objects", "[Octree]" ) {
 
       for(unsigned int j = 0; j < oc.objects_by_level[i].size(); ++j){
         ++objs_size;
+        std::cout << oc.objects_by_level[i][j].getNodeID() << " ";
         if(id_set.count(oc.objects_by_level[i][j].getNodeID()) == 0){
           id_set.insert(oc.objects_by_level[i][j].getNodeID());
         }
         else if(oc.objects_by_level[i][j-1].getNodeID() != oc.objects_by_level[i][j].getNodeID()){
           sorted = false;
+          std::cout << oc.objects_by_level[i][j-1].getNodeID() << "!=" << oc.objects_by_level[i][j].getNodeID() << "\n";
         }
       }
-
       REQUIRE(sorted);
     }
     REQUIRE(objs_size == objs.size());

@@ -48,6 +48,10 @@ class Node {
             divided{false}, parent{father},
             left_sibling{l_sibling}, right_sibling{r_sibling}
             {
+              // if(octree == nullptr){
+              //   std::cerr << "octree = nullptr " << std::endl;
+              //   exit(-1);
+              // }
               // std::cout << "{";
               // std::cout << "parent = " << father << std::endl;
               // std::cout << "l_sibling = " << l_sibling << std::endl;
@@ -71,7 +75,8 @@ class Node {
     void setRightSibling(Node* other) {right_sibling = other;};
     std::vector<Node>& getChildren() {return children;};
 
-    void insert(math::OBB obj);
+    void insert(OctreeOBB obj);
+    void insert(math::OBB obj, unsigned int vector_index);
     void insert(const unsigned int index);
     bool remove(const math::OBB& obj);
     bool remove(const unsigned int index);

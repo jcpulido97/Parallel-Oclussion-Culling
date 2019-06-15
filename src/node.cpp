@@ -7,11 +7,12 @@ void Node::insert(const unsigned int index){
   objects.emplace_back(index);
 };
 
-void Node::insert(math::OBB obj){
+
+void Node::insert(OctreeOBB obj){
   if(divided){
     bool inserted = false;
     for(auto& it :children){
-      if(it.region.Contains(obj)){
+      if(it.region.Contains(obj.obb)){
         it.insert(obj);
         inserted = true;
         break;
@@ -19,7 +20,40 @@ void Node::insert(math::OBB obj){
     }
     if(!inserted){
         int obj_index;
-        OctreeOBB pair = {getID(), math::OBB(obj), getPath()};
+        obj.setNodeID(getID());
+        obj_index = octree->insert(level, obj, this);
+        insert(obj_index);
+    }
+  }
+  else{
+    if(region.Contains(obj.obb)){
+      int obj_index;
+      obj.setNodeID(getID());
+      obj.setPath(getPath());
+      obj_index = octree->insert(level, obj, this);
+      insert(obj_index);
+    }
+    if(objects.size() > MAX_OBJECTS){
+      // std::cout << "[Node] - Subdivide: "<< getID() <<"\n";
+      subdivide();
+    }
+  }
+};
+
+
+void Node::insert(math::OBB obj, unsigned int vector_index){
+  if(divided){
+    bool inserted = false;
+    for(auto& it :children){
+      if(it.region.Contains(obj)){
+        it.insert(obj, vector_index);
+        inserted = true;
+        break;
+      }
+    }
+    if(!inserted){
+        int obj_index;
+        OctreeOBB pair = {vector_index, getID(), math::OBB(obj), getPath()};
         obj_index = octree->insert(level, pair, this);
         insert(obj_index);
     }
@@ -27,7 +61,7 @@ void Node::insert(math::OBB obj){
   else{
     if(region.Contains(obj)){
       int obj_index;
-      OctreeOBB pair = {getID(), math::OBB(obj), getPath()};
+      OctreeOBB pair = {vector_index, getID(), math::OBB(obj), getPath()};
       obj_index = octree->insert(level, pair, this);
       insert(obj_index);
     }
@@ -146,7 +180,7 @@ void Node::subdivide(){
       for(unsigned int i = 0; i < 8 && !inserted; ++i){
         if(octant[i].Contains(vec[objects[obj]].obb)){
           // std::cout << "[Node] - Item moved " << octree->assureObjectsInLevel(level)[it].first << std::endl;
-          children[i].insert(vec[objects[obj]].obb);
+          children[i].insert(vec[objects[obj]]);
           remove(objects[obj--]);
           true_size--;
           inserted = true;

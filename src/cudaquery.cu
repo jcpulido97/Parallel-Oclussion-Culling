@@ -1,6 +1,6 @@
 #include "cudaquery.cuh"
 
-#define EPSILON 0.001
+#define EPSILON 0.01
 #define MINUS_EPSILON -EPSILON
 #define SIZE sizeof(std::pair<unsigned int, vec[8]>)
 // #define CUDA_PRINT
@@ -24,7 +24,7 @@
 */
 
 __device__ __forceinline__
-void checkFaces(const vec& camera_pos,  const vec& camera_dir,
+void checkFaces(const vec& camera_pos,
                 vec* ocluder, vec* ocludee, unsigned int* visible){
 
   float vec_length;
@@ -278,24 +278,24 @@ void checkFaces(const vec& camera_pos,  const vec& camera_dir,
               atomicAnd(&visible[i], false);
             }
           }
-          // else{
-          //   #ifdef CUDA_PRINT
-          //   printf("%i %i Point not behind\n", blockIdx.x, threadIdx.x);
-          //   #endif
-          // }
+          else{
+            #ifdef CUDA_PRINT
+            printf("%i %i Point not behind\n", blockIdx.x, threadIdx.x);
+            #endif
+          }
         }
       }
     }
   }
-  // else{
-  //   #ifdef CUDA_PRINT
-  //   printf("%i %i Not visible\n", blockIdx.x, threadIdx.x);
-  //   #endif
-  // }
+  else{
+    #ifdef CUDA_PRINT
+    printf("%i %i Not visible %f\n", blockIdx.x, threadIdx.x, cull_dot);
+    #endif
+  }
 }
 
 __global__
-void occlusion(vec camera_pos, vec camera_dir, std::pair<unsigned int,vec[8]>* gpu_points, unsigned int* object_visibility_array, unsigned int size) {
+void occlusion(vec camera_pos, std::pair<unsigned int,vec[8]>* gpu_points, unsigned int* object_visibility_array, unsigned int size) {
   int object_to_check = blockIdx.x;
   int i = object_to_check + 1;
   __shared__ unsigned int visibility_points_array[8];
@@ -317,7 +317,12 @@ void occlusion(vec camera_pos, vec camera_dir, std::pair<unsigned int,vec[8]>* g
     // Check if gpu_points are from same node as our
     while(gpu_points[i].first == gpu_points[object_to_check].first){
 
-      checkFaces(camera_pos, camera_dir, gpu_points[object_to_check].second, gpu_points[i].second, visibility_points_array);
+      if(threadIdx.x == 0){
+        #ifdef CUDA_PRINT
+          printf("---------------checking Object %i against %i\n", object_to_check, i);
+        #endif
+      }
+      checkFaces(camera_pos, gpu_points[object_to_check].second, gpu_points[i].second, visibility_points_array);
 
       // Every thread must have completed its face checking
       __syncthreads();
@@ -339,9 +344,9 @@ void occlusion(vec camera_pos, vec camera_dir, std::pair<unsigned int,vec[8]>* g
           atomicAnd(&object_visibility_array[i],0);
         }
         else{
-          // #ifdef CUDA_PRINT
-          // printf("---------------Object %i DON'T oclude %i\n", object_to_check, i);
-          // #endif
+          #ifdef CUDA_PRINT
+          printf("---------------Object %i DON'T oclude %i\n", object_to_check, i);
+          #endif
         }
         // Restart visibility_points_array for next object
         visibility_points_array[0] = 1;
@@ -368,7 +373,13 @@ void occlusion(vec camera_pos, vec camera_dir, std::pair<unsigned int,vec[8]>* g
     // Check if gpu_points are from same node as our
     while(gpu_points[i].first == gpu_points[object_to_check].first){
 
-      checkFaces(camera_pos, camera_dir, gpu_points[object_to_check].second, gpu_points[i].second, visibility_points_array);
+      if(threadIdx.x == 0){
+        #ifdef CUDA_PRINT
+          printf("---------------checking Object %i against %i\n", object_to_check, i);
+        #endif
+      }
+
+      checkFaces(camera_pos, gpu_points[object_to_check].second, gpu_points[i].second, visibility_points_array);
 
       __syncthreads();
 
@@ -413,13 +424,13 @@ void occlusion(vec camera_pos, vec camera_dir, std::pair<unsigned int,vec[8]>* g
   }
 }
 
-CudaQuery::CudaQuery(const std::deque<OctreeOBB>& objects){
+CudaQuery::CudaQuery(const std::deque<std::pair<OctreeOBB,unsigned int>>& objects){
   size = objects.size();
   cpu_points = new std::pair<unsigned int, vec[8]>[size];
   math::vec tmp_points[8];
   for(int i = 0; i < objects.size(); ++i){
-    cpu_points[i].first = objects[i].getNodeID();
-    objects[i].obb.GetCornerPoints(tmp_points);
+    cpu_points[i].first = objects[i].first.getNodeID();
+    objects[i].first.obb.GetCornerPoints(tmp_points);
 
     // std::cout << "{" << tmp_points[0].x << ',' << tmp_points[0].y << ',' << tmp_points[0].z << "}\n";
     // std::cout << "{" << tmp_points[1].x << ',' << tmp_points[1].y << ',' << tmp_points[1].z << "}\n";
@@ -459,13 +470,13 @@ void CudaQuery::transferGPU(){
   gpuErrchk(cudaMemcpy(gpu_points, cpu_points, size*SIZE, cudaMemcpyHostToDevice));
 }
 
-void CudaQuery::run(vec camera_pos, vec camera_dir, std::vector<unsigned int>* cpu_visibility){
+void CudaQuery::run(vec camera_pos, std::vector<unsigned int>* cpu_visibility){
   if(size > 0){
     if(gpu_points != nullptr){
       using namespace std::chrono;
       auto t1 = high_resolution_clock::now();
 
-      occlusion<<<size,6>>>(camera_pos, camera_dir, gpu_points, object_visibility_array, size);
+      occlusion<<<size,6>>>(camera_pos, gpu_points, object_visibility_array, size);
       gpuErrchk(cudaDeviceSynchronize());
 
       // Finished

@@ -57,7 +57,7 @@ Octree::Octree(const std::vector<math::OBB>& objs, double scale_factor): objects
   insertNode(root, root);
 
   for(unsigned int j = 0; j < objs.size(); j++){
-    root->insert(objs[j]);
+    root->insert(objs[j], j);
   }
   reorder();
 }
@@ -220,78 +220,77 @@ unsigned int Octree::computeOcclusions(const math::Frustum& camera,
 
   if(last_oclussion.first.first.x  == camera_pos.x &&
      last_oclussion.first.first.y  == camera_pos.y &&
-     last_oclussion.first.first.z  == camera_pos.z &&
+     last_oclussion.first.first.z  == camera_pos.z/* &&
      last_oclussion.first.second.x  == camera_dir.x &&
      last_oclussion.first.second.y  == camera_dir.y &&
-     last_oclussion.first.second.z  == camera_dir.z){
+     last_oclussion.first.second.z  == camera_dir.z*/){
 
     *visible_objs = last_oclussion.second;
 
     auto t2 = std::chrono::high_resolution_clock::now();
     auto time_span = duration_cast<duration<double>>(t2 - t1);
-    std::cout << "[Octree] - Oclussions computation  took " << (time_span.count()*1000) << " ms Cache HIT\n";
+    // std::cout << "[Octree] - Oclussions computation  took " << (time_span.count()*1000) << " ms Cache HIT\n";
 
     return last_oclussion.second.size();
   }
 
-  std::deque<OctreeOBB> objs_levels;
+  std::deque<std::pair<OctreeOBB,unsigned int>> objs_levels;
   std::vector<unsigned int> visibility_array;
-  std::vector<unsigned int> parent_id;
   unsigned int level = level_left_to_right.size() - 1;
   unsigned int octree_prune = 0;
+  unsigned int id = -1;
+  auto comp = [&](auto& a, auto& b){return a.first < b.first;};
 
 
-  for(auto it = level_left_to_right.rbegin(); it != level_left_to_right.rend();){
+  for(auto it = level_left_to_right.rbegin(); it != level_left_to_right.rend();++it){
 
     auto it2 = *it;
-    parent_id.clear();
-    parent_id.reserve(objects_by_level[level].size());
     while (it2 != nullptr) {
-      if(it2->region.Intersects(camera)){
+      // if(it2->region.Intersects(camera)){
         for(auto index : it2->getObjectsIndexes()){
           ++octree_prune;
-          objs_levels.push_back(objects_by_level[level][index]);
           if(it2->getParent() != nullptr)
-            parent_id.push_back(it2->getParent()->getID());
+            id = it2->getParent()->getID();
+          else{
+            id = 1;
+          }
+          objs_levels.emplace_back(objects_by_level[level][index], id);
         }
-      }
+      // }
       it2 = it2->getRightSibling();
     }
 
-    std::sort(objs_levels.begin(), objs_levels.end());
+    std::sort(objs_levels.begin(), objs_levels.end(), comp);
 
-    // std::cout << "Sending objects = [";
+    // std::cout << "_Sending objects = [";
     // for(auto& it : objs_levels){
-    //   std::cout << it.getNodeID() << ",";
+    //   std::cout << it.first.getNodeID() << ",";
     // }
     // std::cout << "]" << std::endl;
     // std::cout << "Sending objects = [";
     // for(auto& it : objs_levels){
-    //   std::cout << it.getObjectID() << ",";
+    //   std::cout << it.first.getObjectID() << ",";
     // }
     // std::cout << "]" << std::endl;
 
     if(objs_levels.size() > 0){
       CudaQuery query(objs_levels);
-      query.run(camera_pos, camera_dir, &visibility_array);
+      query.run(camera_pos, &visibility_array);
     }
     // std::cout << "Visible objects = [";
     // for(auto& it : visibility_array){
     //   std::cout << (bool)it << ",";
     // }
-    // std::cout << "]" << std::endl;
-
-    --level;
-    ++it;
+    // std::cout << "] - " <<  visibility_array.size() << std::endl;
 
 
-    if(it != level_left_to_right.rend()){
+    if(level != 0){
       // Merge with upper level if not last level
       unsigned int erased_elements = 0;
       for(unsigned int i = 0; i < visibility_array.size(); ++i){
         if(visibility_array[i]){
           // std::cout << "[ " << objs_levels[i-erased_elements].getNodeID() << " -> " << parent_id[i] << "]\n";
-          objs_levels[i-erased_elements].setNodeID(parent_id[i]);
+          objs_levels[i-erased_elements].first.setNodeID(objs_levels[i-erased_elements].second);
         }
         else{
           objs_levels.erase(objs_levels.begin()+i-erased_elements);
@@ -299,20 +298,54 @@ unsigned int Octree::computeOcclusions(const math::Frustum& camera,
         }
       }
     }
-    else{
-      // Add last visible objects that went up the tree
-      visible_objs->resize(visibility_array.size());
-      for(unsigned int i = 0; i < visibility_array.size(); ++i){
-        if(visibility_array[i]){
-          (*visible_objs)[i] = objs_levels[i].getObjectID();
-        }
-      }
-    }
 
+    --level;
   }
+
+  unsigned int erased_elements = 0;
+  for(unsigned int i = 0; i < visibility_array.size(); ++i){
+    if(visibility_array[i]){
+      // std::cout << "[ " << objs_levels[i-erased_elements].getNodeID() << " -> " << parent_id[i] << "]\n";
+      objs_levels[i-erased_elements].first.setNodeID(0);
+    }
+    else{
+      objs_levels.erase(objs_levels.begin()+i-erased_elements);
+      ++erased_elements;
+    }
+  }
+  std::sort(objs_levels.begin(), objs_levels.end(), comp);
+
+  // std::cout << "________________________\n";
+  // std::cout << "_Sending objects = [";
+  // for(auto& it : objs_levels){
+  //   std::cout << it.first.getNodeID() << ",";
+  // }
+  // std::cout << "]" << std::endl;
+
+  CudaQuery query(objs_levels);
+  query.run(camera_pos, &visibility_array);
+
+  // std::cout << "Visible objects = [";
+  // for(auto& it : visibility_array){
+  //   std::cout << (bool)it << ",";
+  // }
+  // std::cout << "] - " <<  visibility_array.size() << std::endl;
+
+  // Add last visible objects that went up the tree
+  visible_objs->clear();
+  visible_objs->reserve(visibility_array.size());
+  for(unsigned int i = 0; i < visibility_array.size(); ++i){
+    if(visibility_array[i]){
+      // std::cout << objs_levels[i].getObjectID() << "_ ";
+      visible_objs->push_back(objs_levels[i].first.getObjectID());
+    }
+  }
+
   auto t2 = std::chrono::high_resolution_clock::now();
   auto time_span = duration_cast<duration<double>>(t2 - t1);
   std::cout << "[Octree] - Oclussions computation  took " << (time_span.count()*1000) << " ms\n";
+  std::cout << "[Octree] - Objects after occlusion " << visible_objs->size()
+            << "   |   Original size " << getTotalObjectsSize() << "\n";
 
   last_oclussion.first.first = camera_pos;
   last_oclussion.first.second = camera_dir;

@@ -30,11 +30,11 @@ class CudaQuery{
     int size;
   public:
     // CudaQuery(const std::vector<OctreeOBB>& objects);
-    CudaQuery(const std::deque<OctreeOBB>& objects);
+    CudaQuery(const std::deque<std::pair<OctreeOBB,unsigned int>>& objects);
     ~CudaQuery(){gpuErrchk(cudaFree(gpu_points));
                  gpuErrchk(cudaFree(object_visibility_array));
                  delete[] cpu_points;};
     void transferGPU();
-    void run(vec camera_pos, vec camera_dir, std::vector<unsigned int>* cpu_visibility);
+    void run(vec camera_pos, std::vector<unsigned int>* cpu_visibility);
     void allocate(const std::vector<OctreeOBB>& objects);
 };

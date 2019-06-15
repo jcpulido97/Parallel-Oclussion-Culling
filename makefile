@@ -4,8 +4,8 @@ NVCC = nvcc
 BUILD_PATH = build
 COMPILE_FLAGS = -O3 -std=c++14 -Wall -Wextra -g #-fsanitize=address
 CUDA_FLAGS = -g -O3 -arch=sm_30
-INCLUDES = -I include/ -I tests/ -I /usr/local/include  -I/usr/local/cuda/include
-LIBS = -Llibs/ -lMathGeoLib -L/usr/local/cuda/lib64 -lcudart #-lglfw -lrt -lm -ldl #-lasan
+INCLUDES = -I/usr/include/GL -I include/ -I tests/ -I /usr/local/include  -I/usr/local/cuda/include
+LIBS = -Llibs/ -lMathGeoLib -L/usr/local/cuda/lib64 -lcudart -lGL -lGLU -lglut -lglfw -lGLEW -lrt -lm -ldl #-lasan
 
 TARGET      = main.out
 TARGET_TEST = tests.out
@@ -58,3 +58,4 @@ $(OBJ_DIR)/%.o : $(TEST_DIR)/%.cpp
 clean:
 		@echo "CLEANING"
 		@$(RM) -r $(BUILD_PATH)/*
+		@$(RM)  $(TARGET_TEST) $(TARGET)

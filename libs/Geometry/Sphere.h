@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file Sphere.h
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief The Sphere geometry object. */
 #pragma once
 
@@ -102,7 +102,7 @@ public:
 	/// @return 2*r.
 	/// @see r, SurfaceArea(), Volume().
 	float Diameter() const { return 2.f * r; }
-			
+
 	/// Returns the center of mass of this sphere.
 	/** @return pos.
 		@see pos */
