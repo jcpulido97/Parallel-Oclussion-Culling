@@ -10,10 +10,6 @@
 
 
 
-Documento del TFG
-
-
-
 ### Estructura
 
 - **doc/** se encuentra toda la documentación del proyecto tanto diagramas como imágenes

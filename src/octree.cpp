@@ -347,6 +347,8 @@ unsigned int Octree::computeOcclusions(const math::Frustum& camera,
   std::cout << "[Octree] - Objects after occlusion " << visible_objs->size()
             << "   |   Original size " << getTotalObjectsSize() << "\n";
 
+  std::sort(visible_objs->begin(), visible_objs->end());
+
   last_oclussion.first.first = camera_pos;
   last_oclussion.first.second = camera_dir;
   last_oclussion.second = *visible_objs;

@@ -55,6 +55,7 @@ double lastTime = 0.0;
 math::Frustum frustum;
 
 bool occlusion = false;
+bool reverse_paint = false;
 
 void error_callback(int error, const char* description){
     fprintf(stderr, "Error%i: %s\n", error, description);
@@ -154,6 +155,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
       case GLFW_KEY_LEFT: Observer_angle_y-=ANGLE_STEP;break;
       case GLFW_KEY_DOWN: Observer_angle_x+=ANGLE_STEP;break;
       case GLFW_KEY_RIGHT: Observer_angle_y+=ANGLE_STEP;break;
+      case GLFW_KEY_P: if(action == GLFW_PRESS) reverse_paint=!reverse_paint;break;
       case GLFW_KEY_O:
         if(action == GLFW_PRESS){
           occlusion=!occlusion;
@@ -225,7 +227,9 @@ int main(int argc,  char* argv[]){
   glfwSwapInterval(0);
 
   glfwGetFramebufferSize(window, &width, &height);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
   glViewport(0, 0, width, height);
+  escala = (1.0*width)/height;
   glFrustum(X_MIN*escala,X_MAX*escala,Y_MIN,Y_MAX,FRONT_PLANE_PERSPECTIVE,BACK_PLANE_PERSPECTIVE);
 
   const GLubyte* strm;
@@ -324,6 +328,8 @@ int main(int argc,  char* argv[]){
       // cout << "{" << camera_pos.x  << ", " << camera_pos.y << ", " << camera_pos.z << "} - ";
       // cout << "{" << camera_dir.x  << ", " << camera_dir.y << ", " << camera_dir.z << "}\n";
       // cout << "Total objects " << VBO.size()  << " - After occlusion culling " << visible_objs.size() << "\n";
+      if(reverse_paint)
+        std::sort(visible_objs.rbegin(), visible_objs.rend());
 
       for(unsigned int i= 0; i < visible_objs.size(); ++i){
         for(unsigned int face= 0; face < VBO[i].size(); face+=3){
@@ -341,16 +347,30 @@ int main(int argc,  char* argv[]){
     }
     else{
       discarded_obj = size;
-      for(unsigned int i= 0; i< VBO.size(); ++i){
-        for(unsigned int face= 0; face < VBO[i].size(); face+=3){
-          glPolygonMode(GL_FRONT,GL_FILL);
-          // glColor4f((i)%255, (i)%255, i%255, 0.85);
-          glColor4f(200, 200, 200, 0.75);
-          glBegin(GL_TRIANGLES);
-            glVertex3f(VBO[i][face].x,   VBO[i][face].y,   VBO[i][face].z);
-            glVertex3f(VBO[i][face+1].x, VBO[i][face+1].y, VBO[i][face+1].z);
-            glVertex3f(VBO[i][face+2].x, VBO[i][face+2].y, VBO[i][face+2].z);
-          glEnd();
+      if(!reverse_paint){
+        for(unsigned int i= 0; i< VBO.size(); ++i){
+          for(unsigned int face= 0; face < VBO[i].size(); face+=3){
+            glPolygonMode(GL_FRONT,GL_FILL);
+            glColor4f(200, 200, 200, 0.75);
+            glBegin(GL_TRIANGLES);
+              glVertex3f(VBO[i][face].x,   VBO[i][face].y,   VBO[i][face].z);
+              glVertex3f(VBO[i][face+1].x, VBO[i][face+1].y, VBO[i][face+1].z);
+              glVertex3f(VBO[i][face+2].x, VBO[i][face+2].y, VBO[i][face+2].z);
+            glEnd();
+          }
+        }
+      }
+      else{
+        for(int i=  VBO.size()-1; i>=0; --i){
+          for(unsigned int face= 0; face < VBO[i].size(); face+=3){
+            glPolygonMode(GL_FRONT,GL_FILL);
+            glColor4f(200, 200, 200, 0.75);
+            glBegin(GL_TRIANGLES);
+              glVertex3f(VBO[i][face].x,   VBO[i][face].y,   VBO[i][face].z);
+              glVertex3f(VBO[i][face+1].x, VBO[i][face+1].y, VBO[i][face+1].z);
+              glVertex3f(VBO[i][face+2].x, VBO[i][face+2].y, VBO[i][face+2].z);
+            glEnd();
+          }
         }
       }
     }
