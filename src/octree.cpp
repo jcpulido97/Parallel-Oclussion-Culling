@@ -246,7 +246,7 @@ unsigned int Octree::computeOcclusions(const math::Frustum& camera,
 
     auto it2 = *it;
     while (it2 != nullptr) {
-      // if(it2->region.Intersects(camera)){
+      if(it2->region.Intersects(camera)){
         for(auto index : it2->getObjectsIndexes()){
           ++octree_prune;
           if(it2->getParent() != nullptr)
@@ -256,7 +256,7 @@ unsigned int Octree::computeOcclusions(const math::Frustum& camera,
           }
           objs_levels.emplace_back(objects_by_level[level][index], id);
         }
-      // }
+      }
       it2 = it2->getRightSibling();
     }
 
