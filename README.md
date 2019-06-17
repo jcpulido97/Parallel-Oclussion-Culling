@@ -8,7 +8,7 @@
 
 ​		Este trabajo viene de la motivación provocada por la falta de contenido abierto que existe en el ámbito de los gráficos, si bien es cierto que existen librerías que ayudan a la realización de dicha tarea, todas suelen ser de código cerrado o soluciones que hayan implementado directamente los desarrolladores de los distintos motores gŕaficos que se utilizan en la actualidad ya sea Unreal Engine o Unity. Los cuales aún siendo gratuitos de usar, no podemos saber qué algoritmos/tecnologías los componen ni si pueden ser mejoradas o adaptadas para las próximas tecnologías. 
 
-
+![main](https://raw.githubusercontent.com/jcpulido97/TFG/master/doc/img/screenshot.png?token=AFM4SFGQLZNL2OPI63JE7AC5CCQRA)
 
 ### Estructura
 
