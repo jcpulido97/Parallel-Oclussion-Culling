@@ -1,5 +1,7 @@
 # Framework para abstracción de entornos heterogéneos CPU/GPU
 
+Uso de la librería MathGeoLib https://github.com/juj/MathGeoLib
+
 ## Optimización de renderización por cálculo de occlusion culling en paralelo
 
 
