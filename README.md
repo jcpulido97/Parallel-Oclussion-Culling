@@ -1,10 +1,14 @@
 # Framework para abstracción de entornos heterogéneos CPU/GPU
 
-Uso de la librería MathGeoLib https://github.com/juj/MathGeoLib
+**Uso de la librería MathGeoLib https://github.com/juj/MathGeoLib**
+
+<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTd7sK07gH_FzqXG5e1gP_M1VlGLsDWkDamUa7ngDLPcQWY_wZ5g_UvAXsz6NwRXwoXXtPU-EYAUu53/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
 ## Demo
 
 [![Occlusion-Culling](https://video-to-markdown.netlify.com/.netlify/functions/image?url=https%3A%2F%2Fvimeo.com%2F348480920)](https://vimeo.com/348480920 "Occlusion-Culling")
+
+<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTd7sK07gH_FzqXG5e1gP_M1VlGLsDWkDamUa7ngDLPcQWY_wZ5g_UvAXsz6NwRXwoXXtPU-EYAUu53/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
 ## Optimización de renderización por cálculo de occlusion culling en paralelo
 
