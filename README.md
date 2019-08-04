@@ -6,6 +6,9 @@
 
 [![Occlusion-Culling](https://video-to-markdown.netlify.com/.netlify/functions/image?url=https%3A%2F%2Fvimeo.com%2F348480920)](https://vimeo.com/348480920 "Occlusion-Culling")
 
+## Estructura de Datos principal (Octree optimizado)
+![arbol](https://raw.githubusercontent.com/jcpulido97/Parallel-Oclussion-Culling/master/doc/img/arbol.png)
+
 **Documentación de las estructuras de datos** https://github.com/jcpulido97/Parallel-Oclussion-Culling/blob/master/doc/presentacion.pdf
 
 ## Optimización de renderización por cálculo de occlusion culling en paralelo
