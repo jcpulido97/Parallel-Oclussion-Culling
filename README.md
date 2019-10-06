@@ -37,11 +37,12 @@
 
 ### Controles
 
-| Uso                   | Key                    |
-| --------------------- | ---------------------- |
-| **Mover Camara**      | ↑	↓ ←	→	(Arrow Keys)   |
-| **Subir/Bajar**       | PageUp/PageDown        |
-| **Oclussion Toggle**  | o                      |
+| Uso                           | Key                    |
+| ----------------------------- | ---------------------- |
+| **Mover Camara**              | W A S D                |
+| **Rotar Camara**              | ↑	↓ ←	→	(Arrow Keys)   |
+| **Subir/Bajar**               | PageUp/PageDown        |
+| **Oclussion Culling Toggle**  | o                      |
 
 ### Mejoras
 Se han ejecutado distintas pruebas en el siguiente equipo:
