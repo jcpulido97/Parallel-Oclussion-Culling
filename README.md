@@ -2,6 +2,13 @@
 
 **Uso de la librería MathGeoLib https://github.com/juj/MathGeoLib**
 
+### Dependencias
+
+```bash
+ $> sudo apt-get install nvidia-cuda-toolkit libglew-dev freeglut3 freeglut3-dev libglfw3 libglfw3-dev
+ $> make
+```
+
 ## Demo
 
 [![Occlusion-Culling](https://video-to-markdown.netlify.com/.netlify/functions/image?url=https%3A%2F%2Fvimeo.com%2F348480920)](https://vimeo.com/348480920 "Occlusion-Culling")
@@ -29,11 +36,6 @@
 - **tests/** todos los tests de las diferentes clases del proyecto
 - **libs/** las librerías usadas en este proyecto. En este caso solo [MathGeoLib](https://github.com/juj/MathGeoLib)
 
-### Instalacion
-
-```bash
- sudo apt-get install nvidia-cuda-toolkit libglew-dev freeglut3 freeglut3-dev libglfw3 libglfw3-dev
-```
 
 ### Controles
 
