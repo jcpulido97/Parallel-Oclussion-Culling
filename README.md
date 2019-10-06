@@ -35,6 +35,14 @@
  sudo apt-get install nvidia-cuda-toolkit libglew-dev freeglut3 freeglut3-dev libglfw3 libglfw3-dev
 ```
 
+### Controles
+
+| Uso                   | Key                    |
+| --------------------- | ---------------------- |
+| **Mover Camara**      | ↑	↓ ←	→	(Arrow Keys)   |
+| **Subir/Bajar**       | PageUp/PageDown        |
+| **Oclussion Toggle**  | o                      |
+
 ### Mejoras
 Se han ejecutado distintas pruebas en el siguiente equipo:
 
