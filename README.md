@@ -29,7 +29,11 @@
 - **tests/** todos los tests de las diferentes clases del proyecto
 - **libs/** las librerías usadas en este proyecto. En este caso solo [MathGeoLib](https://github.com/juj/MathGeoLib)
 
-​	
+### Instalacion
+
+'''
+ sudo apt-get install nvidia-cuda-toolkit libglew-dev freeglut3 freeglut3-dev libglfw3 libglfw3-dev
+'''bash
 
 ### Mejoras
 Se han ejecutado distintas pruebas en el siguiente equipo:
