@@ -1,67 +1,63 @@
-# Framework para abstracción de entornos heterogéneos CPU/GPU
+# Framework for abstraction of heterogeneous CPU / GPU environments
 
-**Uso de la librería MathGeoLib https://github.com/juj/MathGeoLib**
+**Using the MathGeoLib library https://github.com/juj/MathGeoLib**
 
-### Dependencias
+### Dependencies
 
 ```bash
  $> sudo apt-get install nvidia-cuda-toolkit libglew-dev freeglut3 freeglut3-dev libglfw3 libglfw3-dev
  $> make
 ```
 
-## Demo
+## Video of demo
+[![Occlusion-Culling](https://i.imgur.com/uopEtAv.jpeg)](https://vimeo.com/348480920 "Occlusion-Culling")
 
-[![Occlusion-Culling](https://video-to-markdown.netlify.com/.netlify/functions/image?url=https%3A%2F%2Fvimeo.com%2F348480920)](https://vimeo.com/348480920 "Occlusion-Culling")
+## Main Data Structure (Octree optimized)
+![tree](https://raw.githubusercontent.com/jcpulido97/Parallel-Oclussion-Culling/master/doc/img/arbol.png)
 
-## Estructura de Datos principal (Octree optimizado)
-![arbol](https://raw.githubusercontent.com/jcpulido97/Parallel-Oclussion-Culling/master/doc/img/arbol.png)
+**Documentation of data structures (spanish)** https://github.com/jcpulido97/Parallel-Oclussion-Culling/blob/master/doc/presentacion.pdf
 
-**Documentación de las estructuras de datos** https://github.com/jcpulido97/Parallel-Oclussion-Culling/blob/master/doc/presentacion.pdf
+## Rendering optimization by parallel culling occlusion calculation
 
-## Optimización de renderización por cálculo de occlusion culling en paralelo
+In this project, a framework will be developed that provides computing resources to applications in a way that allows them to isolate themselves from low-level details while providing them with tools to adapt the allocation of resources to their real needs. In this case we will focus on trying to optimize the optimization of the scene rendering process, ignoring those objects that are hidden by others so that time is not wasted on calculations that will not be really useful later.
 
-
-
-​		En este proyecto se desarrollará un framework que proporcione recursos de computación a las aplicaciones de manera que les permita aislarse de los detalles de bajo nivel a la vez que les proporcione de herramientas para poder adaptar la asignación de los recursos a sus necesidades reales. En este caso nos centraremos en intentar optimizar el la optimización del proceso de renderizado de escenas obviando aquellos objetos que estén ocultos por otros de forma que no se desperdicie tiempo en cálculos que luego no serán realmente útiles.
-
-​		Este trabajo viene de la motivación provocada por la falta de contenido abierto que existe en el ámbito de los gráficos, si bien es cierto que existen librerías que ayudan a la realización de dicha tarea, todas suelen ser de código cerrado o soluciones que hayan implementado directamente los desarrolladores de los distintos motores gŕaficos que se utilizan en la actualidad ya sea Unreal Engine o Unity. Los cuales aún siendo gratuitos de usar, no podemos saber qué algoritmos/tecnologías los componen ni si pueden ser mejoradas o adaptadas para las próximas tecnologías. 
+This work comes from the motivation caused by the lack of open content that exists in the field of graphics, although it is true that there are libraries that help to carry out this task, all are usually closed source or solutions that have been implemented directly from the developers of the different graphics engines that are currently used, either Unreal Engine or Unity. Which, even though they are free to use, we cannot know what algorithms / technologies compose them or if they can be improved or adapted for the next technologies.
 
 ![main](https://raw.githubusercontent.com/jcpulido97/TFG/master/doc/img/screenshot.png?token=AFM4SFGQLZNL2OPI63JE7AC5CCQRA)
 
-### Estructura
+### Structure
 
-- **doc/** se encuentra toda la documentación del proyecto tanto diagramas como imágenes
-- **include/** todos los ficheros de declaración del proyecto
-- **src/** todos los ficheros de implementación del proyecto
-- **tests/** todos los tests de las diferentes clases del proyecto
-- **libs/** las librerías usadas en este proyecto. En este caso solo [MathGeoLib](https://github.com/juj/MathGeoLib)
+- **doc/** you will find all the project documentation, both diagrams and images
+- **include/** all project declaration files
+- **src/** all project implementation files
+- **tests/** all the tests of the different classes of the project
+- **libs/** the libraries used in this project. In this case only [MathGeoLib](https://github.com/juj/MathGeoLib)
 
 
-### Controles
+### Controls
 
-| Uso                           | Key                    |
+| Use | Key |
 | ----------------------------- | ---------------------- |
-| **Mover Camara**              | W A S D                |
-| **Rotar Camara**              | ↑	↓ ←	→	(Arrow Keys)   |
-| **Subir/Bajar**               | PageUp/PageDown        |
-| **Oclussion Culling Toggle**  | o                      |
+| **Move Camera** | W A S D |
+| **Rotate Camera** | ↑ ↓ ← → (Arrow Keys) |
+| **Up / Down** | PageUp / PageDown |
+| **Occlussion Culling Toggle** | or |
 
-### Mejoras
-Se han ejecutado distintas pruebas en el siguiente equipo:
+### Improvements
+Different tests have been run on the following equipment:
 
-| Categoría             | Dispositivo            |
+| Category | Device |
 | --------------------- | ---------------------- |
-| **CPU**               | i7-7700HQ              |
-| **Cantidad de RAM**   | 16 GB                  |
-| **GPU**               | NVIDIA GTX 1050        |
-| **Sistema Operativo** | Ubuntu 18.04           |
-| **GPU Drivers**       | NVIDIA drivers 390.116 |
+| **CPU** | i7-7700HQ |
+| **Amount of RAM** | 16 GB |
+| **GPU** | NVIDIA GTX 1050 |
+| **Operating System** | Ubuntu 18.04 |
+| **GPU Drivers** | NVIDIA drivers 390.116 |
 
-![Mejoras](https://raw.github.com/jcpulido97/TFG/master/doc/img/prune_benchmark.svg?sanitize=true)
+![Improvements](https://raw.github.com/jcpulido97/TFG/master/doc/img/prune_benchmark.svg?sanitize=true)
 
-Se obtienen bastantes mejoras usando el software para evitar renderizar objetos que están ocluidos
+You get quite a few improvements using the software to avoid rendering objects that are occluded
 
 ![teoric_limit](https://raw.github.com/jcpulido97/TFG/master/doc/img/teoric_limit.svg?sanitize=true)
 
-Mis recomendación es que no se dude en usarlo cuando tengamos escenas de 500 objetos o menos y que cuando la cantidad de objetos sea mayor a 500 hagamos una prueba de si de verdad merece la pena para nuestro caso específico. Destacar que todas las pruebas han sido ejecutadas en el siguiente entorno
-
+My recommendation is that you do not hesitate to use it when we have scenes of 500 objects or less and that when the number of objects is greater than 500 you should do a test of whether it is really worth it for your specific case.
